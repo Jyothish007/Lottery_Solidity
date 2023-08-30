@@ -1,0 +1,36 @@
+//Lottery platform
+pragma solidity >=0.7.0;
+
+contract lottery{
+    address public manager;     //Initialising global variales
+    address payable [] public players;
+    address payable public winner;
+
+    constructor(){
+        manager = msg.sender;       //Manager address
+    }
+    function participate() public payable {
+        require(msg.value==1 ether,"Please pay 1 ether only");  //Condition for paying
+        players.push(payable(msg.sender));
+    }
+    
+    function getbalance() public  view returns (uint){      //Only for manager
+        require(manager==msg.sender,"You are not allowed");
+        return address(this).balance;
+    }
+
+    function random() public view returns (uint){
+        return  uint(keccak256( abi.encodePacked(block.difficulty,block.timestamp,players.length)));    //Choosing a random player
+    }
+    function pickWinner() public  {     //Only for manager
+        require(manager==msg.sender,"You are not allowed");
+        require(players.length>=3,"Insufficient number of players");
+
+        uint r=random();
+        uint index=r%players.length;
+        winner=players[index];
+        winner.transfer(getbalance());    //Transfering the amount to winner
+        players=new address payable [](0);    //Initializing back to zero
+    }
+}
+
