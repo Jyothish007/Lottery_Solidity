@@ -1,0 +1,40 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract CrowdFunding {
+    address payable public owner;
+    uint256 public deadline;
+    uint256 public goal;
+    uint256 public totalAmount;
+
+    event FundingReceived(address indexed from, uint256 indexed amount);
+
+    constructor(uint256 _goal, uint256 _deadline) {
+        owner = payable(msg.sender);
+        goal = _goal;
+        deadline = block.timestamp + _deadline;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Caller is not the owner");
+        _;
+    }
+
+    function receiveFunds() external payable {
+        require(block.timestamp < deadline, "Deadline has passed");
+        require(totalAmount + msg.value >= goal, "Goal has not been reached");
+        totalAmount += msg.value;
+        emit FundingReceived(msg.sender, msg.value);
+    }
+
+    function withdraw() external onlyOwner {
+        require(totalAmount >= goal, "Goal has not been reached");
+        owner.transfer(totalAmount);
+    }
+
+    function refund() external {
+        require(block.timestamp > deadline, "Deadline has not passed");
+        require(totalAmount < goal, "Goal has been reached");
+        payable(msg.sender).transfer(msg.value);
+    }
+}
