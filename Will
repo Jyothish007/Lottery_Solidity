@@ -42,7 +42,13 @@ contract will{
     function payout() private mustBeDeceased{
         for (i=0; i<familyWallets.length ; i++){
             familyWallets[i].transfer(inheritence[familyWallets[i]]);   //transfering the funds from the contract address to recivers address
-            
+
         }
+    }
+
+    //oracle switch simulation
+    function hasDeceased() public onlyOwner{
+        deceased = true;
+        payout();
     }
 }
