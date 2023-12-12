@@ -1,0 +1,48 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.5.7;
+
+contract will{
+    address owner;
+    uint    fortune;
+    bool    deceased;
+    uint    i;
+    
+    constructor() payable public {
+        owner = msg.sender;     //address that is being called
+        fortune = msg.value;    //how much eather is sent
+        deceased = false;
+    }
+
+    //create modifier so the only person who can call is the owner
+    modifier onlyOwner{
+        require(msg.sender == owner);
+        _;      //"_" says the function to shift to the actual function after runing the modifier so the code only work if the condition is true
+    }
+
+    //create modifier so that we only allocate funds if friends grandparents are deceased
+    modifier mustBeDeceased{
+        require(deceased == true);
+        _;
+    }
+
+    //"[]" is an array that contains the wallet address of family members
+    address payable [] familyWallets;
+    
+    //map through inheritance 
+    mapping (address => uint) inheritence;
+
+    //set inheritance to each address
+    function setInheritance(address payable wallet, uint amount) public {
+        familyWallets.push(wallet);        //adds wallet address to the family wallet
+
+        inheritence[wallet] = amount;
+    }
+
+    //pay each family member based on their wallet address
+    function payout() private mustBeDeceased{
+        for (i=0; i<familyWallets.length ; i++){
+            familyWallets[i].transfer(inheritence[familyWallets[i]]);   //transfering the funds from the contract address to recivers address
+            
+        }
+    }
+}
