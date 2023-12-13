@@ -1,3 +1,6 @@
+// The code works as follows
+// A man can allocate the amount that he wants to give to family members or friends after he is deceased when the hasDeceased function is called the amount will be credited to the respective accounts.
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.5.7;
 
@@ -16,10 +19,10 @@ contract will{
     //create modifier so the only person who can call is the owner
     modifier onlyOwner{
         require(msg.sender == owner);
-        _;      //"_" says the function to shift to the actual function after runing the modifier so the code only work if the condition is true
+        _;      //"_" says the function to shift to the actual function after running the modifier so the code only works if the condition is true
     }
 
-    //create modifier so that we only allocate funds if friends grandparents are deceased
+    //create a modifier so that we only allocate funds if friend's grandparents are deceased
     modifier mustBeDeceased{
         require(deceased == true);
         _;
@@ -29,7 +32,7 @@ contract will{
     address payable [] familyWallets;
     
     //map through inheritance 
-    mapping (address => uint) inheritence;
+    mapping (address => uint) inheritance;
 
     //set inheritance to each address
     function setInheritance(address payable wallet, uint amount) public {
@@ -41,7 +44,7 @@ contract will{
     //pay each family member based on their wallet address
     function payout() private mustBeDeceased{
         for (i=0; i<familyWallets.length ; i++){
-            familyWallets[i].transfer(inheritence[familyWallets[i]]);   //transfering the funds from the contract address to recivers address
+            familyWallets[i].transfer(inheritance[familyWallets[i]]);   //transferring the funds from the contract address to receivers address
 
         }
     }
